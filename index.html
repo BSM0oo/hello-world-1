@@ -34,11 +34,6 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             padding: 20px;
         }
-        .chart-title {
-            color: #555;
-            margin-bottom: 20px;
-            font-size: 1.2em;
-        }
         .controls {
             margin-bottom: 20px;
             display: flex;
@@ -61,12 +56,26 @@
         #usa-toggle { background-color: rgb(65, 105, 225); color: white; }
         #china-toggle { background-color: rgb(220, 20, 60); color: white; }
         #russia-toggle { background-color: rgb(50, 205, 50); color: white; }
+        .course-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .course-link:hover {
+            background-color: #2980b9;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Global GDP Comparison 👋</h1>
         <p>Comparing GDP trends of major economies over the last 20 years</p>
+        <a href="mcp-course.html" class="course-link">Check out our MCP Tool Development Course →</a>
     </div>
     
     <div class="chart-container">
@@ -81,7 +90,6 @@
     <script>
         const ctx = document.getElementById('myChart').getContext('2d');
         
-        // GDP data in trillions USD (approximate values)
         const gdpData = {
             years: ['2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
             usa: [12.27, 13.09, 13.86, 14.48, 14.72, 14.42, 14.99, 15.54, 16.20, 16.78, 17.52, 18.22, 18.71, 19.52, 20.58, 21.37, 20.89, 22.99, 25.46, 26.95],
@@ -172,7 +180,6 @@
             }
         });
 
-        // Toggle functionality
         const toggleButtons = {
             usa: document.getElementById('usa-toggle'),
             china: document.getElementById('china-toggle'),
