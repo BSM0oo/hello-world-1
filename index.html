@@ -205,24 +205,41 @@
         const gdpChart = createChart(gdpCtx, gdpData, 'GDP (Trillion USD)');
         const healthChart = createChart(healthCtx, healthData, 'Healthcare Expenditure (% of GDP)');
 
-        function setupToggleButtons(chartInstance, prefix) {
-            const countries = ['usa', 'china', 'russia'];
-            countries.forEach((country, index) => {
-                const button = document.getElementById(prefix + '-' + country + (prefix === 'usa' ? '' : '-health'));
-                if (button) {
-                    button.addEventListener('click', () => {
-                        const isActive = button.classList.contains('active');
-                        button.classList.toggle('active');
-                        button.classList.toggle('inactive');
-                        chartInstance.data.datasets[index].hidden = isActive;
-                        chartInstance.update();
-                    });
-                }
-            });
-        }
+        // Fixed toggle functionality
+        const toggleButtons = {
+            gdp: {
+                usa: document.getElementById('usa-toggle'),
+                china: document.getElementById('china-toggle'),
+                russia: document.getElementById('russia-toggle')
+            },
+            health: {
+                usa: document.getElementById('usa-health-toggle'),
+                china: document.getElementById('china-health-toggle'),
+                russia: document.getElementById('russia-health-toggle')
+            }
+        };
 
-        setupToggleButtons(gdpChart, 'usa');
-        setupToggleButtons(healthChart, 'usa');
+        // Setup toggle functionality for GDP chart
+        Object.entries(toggleButtons.gdp).forEach(([country, button], index) => {
+            button.addEventListener('click', () => {
+                const isActive = button.classList.contains('active');
+                button.classList.toggle('active');
+                button.classList.toggle('inactive');
+                gdpChart.data.datasets[index].hidden = isActive;
+                gdpChart.update();
+            });
+        });
+
+        // Setup toggle functionality for Health chart
+        Object.entries(toggleButtons.health).forEach(([country, button], index) => {
+            button.addEventListener('click', () => {
+                const isActive = button.classList.contains('active');
+                button.classList.toggle('active');
+                button.classList.toggle('inactive');
+                healthChart.data.datasets[index].hidden = isActive;
+                healthChart.update();
+            });
+        });
     </script>
 </body>
 </html>
