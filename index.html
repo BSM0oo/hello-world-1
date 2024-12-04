@@ -161,7 +161,7 @@
                     responsive: true,
                     plugins: {
                         legend: {
-                            position: 'top',
+                            display: false  // Hide the default Chart.js legend
                         },
                         tooltip: {
                             mode: 'index',
@@ -205,7 +205,6 @@
         const gdpChart = createChart(gdpCtx, gdpData, 'GDP (Trillion USD)');
         const healthChart = createChart(healthCtx, healthData, 'Healthcare Expenditure (% of GDP)');
 
-        // Fixed toggle functionality
         const toggleButtons = {
             gdp: {
                 usa: document.getElementById('usa-toggle'),
