@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global GDP Comparison</title>
+    <title>Global Economic Indicators</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <style>
         body {
@@ -22,7 +22,7 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             padding: 20px;
         }
-        h1 {
+        h1, h2 {
             color: #333;
             margin-bottom: 15px;
         }
@@ -53,9 +53,9 @@
         .toggle-btn.inactive {
             opacity: 0.5;
         }
-        #usa-toggle { background-color: rgb(65, 105, 225); color: white; }
-        #china-toggle { background-color: rgb(220, 20, 60); color: white; }
-        #russia-toggle { background-color: rgb(50, 205, 50); color: white; }
+        #usa-toggle, #usa-health-toggle { background-color: rgb(65, 105, 225); color: white; }
+        #china-toggle, #china-health-toggle { background-color: rgb(220, 20, 60); color: white; }
+        #russia-toggle, #russia-health-toggle { background-color: rgb(50, 205, 50); color: white; }
         .course-link {
             display: inline-block;
             margin-top: 15px;
@@ -73,22 +73,34 @@
 </head>
 <body>
     <div class="container">
-        <h1>Global GDP Comparison 👋</h1>
-        <p>Comparing GDP trends of major economies over the last 20 years</p>
+        <h1>Global Economic Indicators 👋</h1>
+        <p>Comparing GDP and healthcare expenditure trends of major economies over the last 20 years</p>
         <a href="mcp-course.html" class="course-link">Check out our MCP Tool Development Course →</a>
     </div>
     
     <div class="chart-container">
+        <h2>GDP Comparison</h2>
         <div class="controls">
             <button id="usa-toggle" class="toggle-btn active">USA</button>
             <button id="china-toggle" class="toggle-btn active">China</button>
             <button id="russia-toggle" class="toggle-btn active">Russia</button>
         </div>
-        <canvas id="myChart"></canvas>
+        <canvas id="gdpChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2>Healthcare Expenditure (% of GDP)</h2>
+        <div class="controls">
+            <button id="usa-health-toggle" class="toggle-btn active">USA</button>
+            <button id="china-health-toggle" class="toggle-btn active">China</button>
+            <button id="russia-health-toggle" class="toggle-btn active">Russia</button>
+        </div>
+        <canvas id="healthChart"></canvas>
     </div>
 
     <script>
-        const ctx = document.getElementById('myChart').getContext('2d');
+        const gdpCtx = document.getElementById('gdpChart').getContext('2d');
+        const healthCtx = document.getElementById('healthChart').getContext('2d');
         
         const gdpData = {
             years: ['2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
@@ -97,107 +109,127 @@
             russia: [0.63, 0.76, 0.99, 1.30, 1.66, 1.22, 1.52, 2.05, 2.21, 2.29, 2.06, 1.36, 1.28, 1.57, 1.67, 1.69, 1.48, 1.77, 2.24, 1.86]
         };
 
-        const chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: gdpData.years,
-                datasets: [
-                    {
-                        label: 'USA GDP',
-                        data: gdpData.usa,
-                        borderColor: 'rgb(65, 105, 225)',
-                        backgroundColor: 'rgba(65, 105, 225, 0.1)',
-                        fill: true,
-                        tension: 0.3,
-                        borderWidth: 3,
-                        pointRadius: 3,
-                        pointHoverRadius: 6
-                    },
-                    {
-                        label: 'China GDP',
-                        data: gdpData.china,
-                        borderColor: 'rgb(220, 20, 60)',
-                        backgroundColor: 'rgba(220, 20, 60, 0.1)',
-                        fill: true,
-                        tension: 0.3,
-                        borderWidth: 3,
-                        pointRadius: 3,
-                        pointHoverRadius: 6
-                    },
-                    {
-                        label: 'Russia GDP',
-                        data: gdpData.russia,
-                        borderColor: 'rgb(50, 205, 50)',
-                        backgroundColor: 'rgba(50, 205, 50, 0.1)',
-                        fill: true,
-                        tension: 0.3,
-                        borderWidth: 3,
-                        pointRadius: 3,
-                        pointHoverRadius: 6
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': $' + context.parsed.y.toFixed(2) + ' trillion';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'GDP (Trillion USD)'
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                return '$' + value.toFixed(1) + 'T';
-                            }
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Year'
-                        }
-                    }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index',
-                }
-            }
-        });
-
-        const toggleButtons = {
-            usa: document.getElementById('usa-toggle'),
-            china: document.getElementById('china-toggle'),
-            russia: document.getElementById('russia-toggle')
+        const healthData = {
+            years: ['2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+            usa: [15.1, 15.2, 15.3, 15.6, 15.9, 16.7, 16.8, 16.8, 16.9, 16.7, 16.8, 17.0, 17.1, 17.1, 17.2, 17.6, 19.7, 18.8, 18.3, 18.0],
+            china: [4.7, 4.7, 4.6, 4.3, 4.3, 4.6, 4.6, 4.8, 5.0, 5.1, 5.2, 5.3, 5.4, 5.4, 5.4, 5.4, 5.8, 5.9, 6.0, 6.1],
+            russia: [5.2, 5.2, 5.3, 5.4, 5.1, 5.6, 5.4, 5.2, 5.5, 5.7, 5.5, 5.3, 5.3, 5.3, 5.3, 5.4, 6.9, 6.6, 6.4, 6.2]
         };
 
-        Object.entries(toggleButtons).forEach(([country, button]) => {
-            button.addEventListener('click', () => {
-                const index = {'usa': 0, 'china': 1, 'russia': 2}[country];
-                const isActive = button.classList.contains('active');
-                
-                button.classList.toggle('active');
-                button.classList.toggle('inactive');
-                
-                chart.data.datasets[index].hidden = isActive;
-                chart.update();
+        function createChart(ctx, data, yAxisLabel) {
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.years,
+                    datasets: [
+                        {
+                            label: 'USA',
+                            data: data.usa,
+                            borderColor: 'rgb(65, 105, 225)',
+                            backgroundColor: 'rgba(65, 105, 225, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            borderWidth: 3,
+                            pointRadius: 3,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: 'China',
+                            data: data.china,
+                            borderColor: 'rgb(220, 20, 60)',
+                            backgroundColor: 'rgba(220, 20, 60, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            borderWidth: 3,
+                            pointRadius: 3,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: 'Russia',
+                            data: data.russia,
+                            borderColor: 'rgb(50, 205, 50)',
+                            backgroundColor: 'rgba(50, 205, 50, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            borderWidth: 3,
+                            pointRadius: 3,
+                            pointHoverRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.y.toFixed(2);
+                                    return context.dataset.label + ': ' + value + (yAxisLabel.includes('GDP') ? ' trillion USD' : '%');
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: yAxisLabel
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return yAxisLabel.includes('GDP') ? '$' + value.toFixed(1) + 'T' : value.toFixed(1) + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Year'
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index',
+                    }
+                }
             });
-        });
+        }
+
+        const gdpChart = createChart(gdpCtx, gdpData, 'GDP (Trillion USD)');
+        const healthChart = createChart(healthCtx, healthData, 'Healthcare Expenditure (% of GDP)');
+
+        function setupToggleButtons(chartInstance, togglePrefix) {
+            const buttons = {
+                usa: document.getElementById(togglePrefix + '-toggle'),
+                china: document.getElementById(togglePrefix + '-health-toggle'),
+                russia: document.getElementById(togglePrefix + '-russia-toggle')
+            };
+
+            Object.entries(buttons).forEach(([country, button]) => {
+                if (button) {
+                    button.addEventListener('click', () => {
+                        const index = {'usa': 0, 'china': 1, 'russia': 2}[country];
+                        const isActive = button.classList.contains('active');
+                        
+                        button.classList.toggle('active');
+                        button.classList.toggle('inactive');
+                        
+                        chartInstance.data.datasets[index].hidden = isActive;
+                        chartInstance.update();
+                    });
+                }
+            });
+        }
+
+        setupToggleButtons(gdpChart, 'usa');
+        setupToggleButtons(healthChart, 'usa-health');
     </script>
 </body>
 </html>
