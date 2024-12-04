@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World with Chart</title>
+    <title>Global GDP Comparison</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <style>
         body {
@@ -39,35 +39,95 @@
             margin-bottom: 20px;
             font-size: 1.2em;
         }
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .toggle-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .toggle-btn.active {
+            opacity: 1;
+        }
+        .toggle-btn.inactive {
+            opacity: 0.5;
+        }
+        #usa-toggle { background-color: rgb(65, 105, 225); color: white; }
+        #china-toggle { background-color: rgb(220, 20, 60); color: white; }
+        #russia-toggle { background-color: rgb(50, 205, 50); color: white; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Hello, World! 👋</h1>
-        <p>Welcome to my simple website.</p>
+        <h1>Global GDP Comparison 👋</h1>
+        <p>Comparing GDP trends of major economies over the last 20 years</p>
     </div>
     
     <div class="chart-container">
-        <div class="chart-title">Monthly Website Visitors</div>
+        <div class="controls">
+            <button id="usa-toggle" class="toggle-btn active">USA</button>
+            <button id="china-toggle" class="toggle-btn active">China</button>
+            <button id="russia-toggle" class="toggle-btn active">Russia</button>
+        </div>
         <canvas id="myChart"></canvas>
     </div>
 
     <script>
         const ctx = document.getElementById('myChart').getContext('2d');
-        new Chart(ctx, {
+        
+        // GDP data in trillions USD (approximate values)
+        const gdpData = {
+            years: ['2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+            usa: [12.27, 13.09, 13.86, 14.48, 14.72, 14.42, 14.99, 15.54, 16.20, 16.78, 17.52, 18.22, 18.71, 19.52, 20.58, 21.37, 20.89, 22.99, 25.46, 26.95],
+            china: [1.96, 2.29, 2.75, 3.55, 4.59, 5.10, 6.09, 7.55, 8.53, 9.57, 10.48, 11.06, 11.23, 12.31, 13.89, 14.28, 14.72, 17.73, 17.96, 17.89],
+            russia: [0.63, 0.76, 0.99, 1.30, 1.66, 1.22, 1.52, 2.05, 2.21, 2.29, 2.06, 1.36, 1.28, 1.57, 1.67, 1.69, 1.48, 1.77, 2.24, 1.86]
+        };
+
+        const chart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                datasets: [{
-                    label: 'Visitors in 2023',
-                    data: [1500, 2200, 3700, 4500, 5200, 6700, 7400, 8200, 9000, 9500, 10200, 11000],
-                    fill: true,
-                    borderColor: 'rgb(75, 192, 192)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    tension: 0.3,
-                    pointRadius: 5,
-                    pointHoverRadius: 8
-                }]
+                labels: gdpData.years,
+                datasets: [
+                    {
+                        label: 'USA GDP',
+                        data: gdpData.usa,
+                        borderColor: 'rgb(65, 105, 225)',
+                        backgroundColor: 'rgba(65, 105, 225, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: 'China GDP',
+                        data: gdpData.china,
+                        borderColor: 'rgb(220, 20, 60)',
+                        backgroundColor: 'rgba(220, 20, 60, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: 'Russia GDP',
+                        data: gdpData.russia,
+                        borderColor: 'rgb(50, 205, 50)',
+                        backgroundColor: 'rgba(50, 205, 50, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    }
+                ]
             },
             options: {
                 responsive: true,
@@ -78,15 +138,30 @@
                     tooltip: {
                         mode: 'index',
                         intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': $' + context.parsed.y.toFixed(2) + ' trillion';
+                            }
+                        }
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'GDP (Trillion USD)'
+                        },
                         ticks: {
                             callback: function(value) {
-                                return value.toLocaleString();
+                                return '$' + value.toFixed(1) + 'T';
                             }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Year'
                         }
                     }
                 },
@@ -95,6 +170,26 @@
                     mode: 'index',
                 }
             }
+        });
+
+        // Toggle functionality
+        const toggleButtons = {
+            usa: document.getElementById('usa-toggle'),
+            china: document.getElementById('china-toggle'),
+            russia: document.getElementById('russia-toggle')
+        };
+
+        Object.entries(toggleButtons).forEach(([country, button]) => {
+            button.addEventListener('click', () => {
+                const index = {'usa': 0, 'china': 1, 'russia': 2}[country];
+                const isActive = button.classList.contains('active');
+                
+                button.classList.toggle('active');
+                button.classList.toggle('inactive');
+                
+                chart.data.datasets[index].hidden = isActive;
+                chart.update();
+            });
         });
     </script>
 </body>
