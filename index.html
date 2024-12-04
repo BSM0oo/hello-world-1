@@ -205,22 +205,15 @@
         const gdpChart = createChart(gdpCtx, gdpData, 'GDP (Trillion USD)');
         const healthChart = createChart(healthCtx, healthData, 'Healthcare Expenditure (% of GDP)');
 
-        function setupToggleButtons(chartInstance, togglePrefix) {
-            const buttons = {
-                usa: document.getElementById(togglePrefix + '-toggle'),
-                china: document.getElementById(togglePrefix + '-health-toggle'),
-                russia: document.getElementById(togglePrefix + '-russia-toggle')
-            };
-
-            Object.entries(buttons).forEach(([country, button]) => {
+        function setupToggleButtons(chartInstance, prefix) {
+            const countries = ['usa', 'china', 'russia'];
+            countries.forEach((country, index) => {
+                const button = document.getElementById(prefix + '-' + country + (prefix === 'usa' ? '' : '-health'));
                 if (button) {
                     button.addEventListener('click', () => {
-                        const index = {'usa': 0, 'china': 1, 'russia': 2}[country];
                         const isActive = button.classList.contains('active');
-                        
                         button.classList.toggle('active');
                         button.classList.toggle('inactive');
-                        
                         chartInstance.data.datasets[index].hidden = isActive;
                         chartInstance.update();
                     });
@@ -229,7 +222,7 @@
         }
 
         setupToggleButtons(gdpChart, 'usa');
-        setupToggleButtons(healthChart, 'usa-health');
+        setupToggleButtons(healthChart, 'usa');
     </script>
 </body>
 </html>
