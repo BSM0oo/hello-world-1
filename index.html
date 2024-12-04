@@ -116,7 +116,7 @@
             russia: [5.2, 5.2, 5.3, 5.4, 5.1, 5.6, 5.4, 5.2, 5.5, 5.7, 5.5, 5.3, 5.3, 5.3, 5.3, 5.4, 6.9, 6.6, 6.4, 6.2]
         };
 
-        function createChart(ctx, data, yAxisLabel) {
+        function createChart(ctx, data, yAxisLabel, isGDP) {
             return new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -161,7 +161,7 @@
                     responsive: true,
                     plugins: {
                         legend: {
-                            display: false  // Hide the default Chart.js legend
+                            display: false
                         },
                         tooltip: {
                             mode: 'index',
@@ -169,7 +169,7 @@
                             callbacks: {
                                 label: function(context) {
                                     const value = context.parsed.y.toFixed(2);
-                                    return context.dataset.label + ': ' + value + (yAxisLabel.includes('GDP') ? ' trillion USD' : '%');
+                                    return context.dataset.label + ': ' + value + (isGDP ? ' trillion USD' : '%');
                                 }
                             }
                         }
@@ -183,7 +183,7 @@
                             },
                             ticks: {
                                 callback: function(value) {
-                                    return yAxisLabel.includes('GDP') ? '$' + value.toFixed(1) + 'T' : value.toFixed(1) + '%';
+                                    return isGDP ? '$' + value.toFixed(1) + 'T' : value.toFixed(1) + '%';
                                 }
                             }
                         },
@@ -202,8 +202,8 @@
             });
         }
 
-        const gdpChart = createChart(gdpCtx, gdpData, 'GDP (Trillion USD)');
-        const healthChart = createChart(healthCtx, healthData, 'Healthcare Expenditure (% of GDP)');
+        const gdpChart = createChart(gdpCtx, gdpData, 'GDP (Trillion USD)', true);
+        const healthChart = createChart(healthCtx, healthData, 'Healthcare Expenditure (% of GDP)', false);
 
         const toggleButtons = {
             gdp: {
